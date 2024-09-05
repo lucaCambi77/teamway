@@ -3,9 +3,12 @@ package com.teamway.demo.controller;
 import com.teamway.demo.domain.WorkerShift;
 import com.teamway.demo.exception.WorkerShiftException;
 import com.teamway.demo.repository.WorkerRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,8 +22,7 @@ public class WorkerShiftController {
 
   private final WorkerRepository workerRepository = new WorkerRepository();
 
-  @RequestMapping(
-      method = RequestMethod.POST,
+  @PostMapping(
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseStatus(code = HttpStatus.CREATED)
