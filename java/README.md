@@ -38,6 +38,6 @@ There are 3 shifts available :
 
 | Shift  | Description |
 |--------|:-----------:|
-| FIRST  |    0 -8     |
-| SECOND |    8 -16    |
-| THIRD  |   16- 24    |
+| FIRST  |    0 - 8    |
+| SECOND |   8 - 16    |
+| THIRD  |   16 - 24   |
