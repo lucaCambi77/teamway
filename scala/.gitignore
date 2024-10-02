@@ -1,5 +1,6 @@
-target
+target/**
 ### IntelliJ IDEA ###
 .idea
 
-project/project
+project/project/**
+project/target/**
