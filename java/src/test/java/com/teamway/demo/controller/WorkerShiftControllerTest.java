@@ -39,7 +39,6 @@ public class WorkerShiftControllerTest {
 
   @Test
   public void shouldCreateWorkerShift() throws Exception {
-
     WorkerShift shift =
         WorkerShift.builder()
             .shift(Shift.FIRST)
@@ -60,7 +59,6 @@ public class WorkerShiftControllerTest {
 
   @Test
   public void shouldThrowWhenWorkerShiftSameDay() throws Exception {
-
     WorkerShift shift =
         WorkerShift.builder()
             .shift(Shift.FIRST)

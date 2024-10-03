@@ -1,5 +1,8 @@
 package com.teamway.demo.domain;
 
+import lombok.Getter;
+
+@Getter
 public enum Shift {
   FIRST("0 - 8 working shift"),
   SECOND("8 - 16 working shift"),
@@ -9,9 +12,5 @@ public enum Shift {
 
   Shift(String description) {
     this.description = description;
-  }
-
-  public String getDescription() {
-    return this.description;
   }
 }

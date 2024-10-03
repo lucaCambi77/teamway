@@ -70,7 +70,6 @@ public class WorkerShiftRepositoryTest {
 
   @Test
   public void shouldNotAddWorkerShift() throws WorkerShiftException {
-
     WorkerShift shift =
         WorkerShift.builder()
             .shift(Shift.FIRST)
