@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
     )
   )
 
-mainClass in Compile := Some("it.cambi.workplanning.WorkPlanningApp")
+Compile / mainClass := Some("it.cambi.workplanning.WorkPlanningApp")
 
 assembly / assemblyJarName := "work-planning.jar"
 

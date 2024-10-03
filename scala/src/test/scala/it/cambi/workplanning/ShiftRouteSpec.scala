@@ -8,7 +8,6 @@ import it.cambi.workplanning.domain.{Shift, Worker}
 import org.http4s.*
 import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.circe.*
-import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.implicits.*
 import org.http4s.server.Server
 import org.scalatest.flatspec.AnyFlatSpec
