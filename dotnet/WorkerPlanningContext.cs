@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dotnet;
 
-public class WorkPlanningContext : DbContext
+public class WorkPlanningContext(DbContextOptions<WorkPlanningContext> options) : DbContext(options)
 {
-    public WorkPlanningContext(DbContextOptions<WorkPlanningContext> options) : base(options) { }
-
     public DbSet<Worker> Workers { get; set; }
     public DbSet<Shift> Shifts { get; set; }
 }

@@ -16,22 +16,7 @@ namespace dotnet.Tests
 
         public WorkersControllerIntegrationTests(WebApplicationFactory<Program> factory)
         {
-            _client = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    // Remove the existing DbContext
-                    var descriptor = services.SingleOrDefault(
-                        d => d.ServiceType == typeof(DbContextOptions<WorkPlanningContext>));
-                    if (descriptor != null)
-                    {
-                        services.Remove(descriptor);
-                    }
-
-                    // Add a new DbContext using an in-memory database
-                    services.AddDbContext<WorkPlanningContext>(options => { options.UseInMemoryDatabase("InMemoryDbForTesting"); });
-                });
-            }).CreateClient();
+            _client = factory.CreateClient();
 
             // Manually create a DbContext using the same in-memory database for direct access
             var options = new DbContextOptionsBuilder<WorkPlanningContext>()
