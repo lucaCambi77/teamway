@@ -1,11 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace dotnet;
+
 public class Worker
 {
     public int WorkerId { get; set; }
     public string Name { get; set; }
     public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
+}
+
+public class WorkerDto
+{
+    public int WorkerId { get; set; }
+    public string Name { get; set; }
+    public ICollection<ShiftDto> Shifts { get; set; }
 }
 
 public enum ShiftType
@@ -25,23 +34,25 @@ public class Shift
     public ShiftType Type { get; set; }  // Enum for shift type
 }
 
+public class ShiftDto
+{
+    public int ShiftId { get; set; }
+    public DateTime Date { get; set; }
+    public int WorkerId { get; set; }
+
+    public ShiftType Type { get; set; }  // Enum for shift type
+}
+
 
 [Route("api/[controller]")]
 [ApiController]
-public class WorkersController : ControllerBase
+public class WorkersController(WorkPlanningContext context) : ControllerBase
 {
-    private readonly WorkPlanningContext _context;
-
-    public WorkersController(WorkPlanningContext context)
-    {
-        _context = context;
-    }
-
     // GET: api/workers
     [HttpGet("{id}")]
     public async Task<ActionResult<Worker>> GetWorkers(int id)
     {
-        var worker = await _context.Workers
+        var worker = await context.Workers
             .Include(w => w.Shifts) // Ensure shifts are loaded
             .FirstOrDefaultAsync(w => w.WorkerId == id);
 
@@ -57,16 +68,16 @@ public class WorkersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Worker>> PostWorker(Worker worker)
     {
-        _context.Workers.Add(worker);
-        await _context.SaveChangesAsync();
+        context.Workers.Add(worker);
+        await context.SaveChangesAsync();
         return CreatedAtAction("GetWorkers", new { id = worker.WorkerId }, worker);
     }
 
     // POST: api/workers/{id}/shifts
     [HttpPost("{id}/shifts")]
-    public async Task<IActionResult> AddShift(int id, Shift shift)
+    public async Task<IActionResult> AddShift(int id, ShiftDto shift)
     {
-        var worker = await _context.Workers
+        var worker = await context.Workers
             .Include(w => w.Shifts)
             .FirstOrDefaultAsync(w => w.WorkerId == id);
 
@@ -83,11 +94,9 @@ public class WorkersController : ControllerBase
             return BadRequest("Invalid shift type.");
         }
 
-        var x_shift = new Shift { ShiftId = 1, Date = DateTime.Now, Type = ShiftType.MORNING, WorkerId = worker.WorkerId };
+        context.Add(new Shift { ShiftId = shift.ShiftId, Date = shift.Date, Type = shift.Type, WorkerId = shift.WorkerId });
 
-        _context.Add(x_shift);
-
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return CreatedAtAction("GetWorkers", new { id = shift.WorkerId }, shift);
     }

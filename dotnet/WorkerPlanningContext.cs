@@ -1,5 +1,8 @@
 // Data/WorkPlanningContext.cs
+
 using Microsoft.EntityFrameworkCore;
+
+namespace dotnet;
 
 public class WorkPlanningContext : DbContext
 {

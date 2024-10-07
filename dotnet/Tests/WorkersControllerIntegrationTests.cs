@@ -1,22 +1,18 @@
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Xunit;
-using FluentAssertions;
 
-
-namespace WorkPlanning.Tests
+namespace dotnet.Tests
 {
     public class WorkersControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
         private readonly HttpClient _client;
         private readonly WorkPlanningContext _context;
-
 
         public WorkersControllerIntegrationTests(WebApplicationFactory<Program> factory)
         {
@@ -33,10 +29,7 @@ namespace WorkPlanning.Tests
                     }
 
                     // Add a new DbContext using an in-memory database
-                    services.AddDbContext<WorkPlanningContext>(options =>
-                    {
-                        options.UseInMemoryDatabase("InMemoryDbForTesting");
-                    });
+                    services.AddDbContext<WorkPlanningContext>(options => { options.UseInMemoryDatabase("InMemoryDbForTesting"); });
                 });
             }).CreateClient();
 
@@ -50,8 +43,8 @@ namespace WorkPlanning.Tests
 
         public void Dispose()
         {
-            _context.Database.EnsureDeleted();  // Clean up the in-memory database after each test
-            _context.Dispose();  // Ensure the DbContext is disposed after each test
+            _context.Database.EnsureDeleted(); // Clean up the in-memory database after each test
+            _context.Dispose(); // Ensure the DbContext is disposed after each test
         }
 
         [Fact]
@@ -60,9 +53,7 @@ namespace WorkPlanning.Tests
             // Arrange
             var worker = new Worker { WorkerId = 1, Name = "John Doe" };
             var response = await _client.PostAsync("/api/workers", new StringContent(
-                JsonConvert.SerializeObject(worker), Encoding.UTF8, "application/json"));
-
-            var workerResponse = await response.Content.ReadAsStringAsync();
+                JsonSerializer.Serialize(worker), Encoding.UTF8, "application/json"));
 
             response.EnsureSuccessStatusCode();
 
@@ -71,7 +62,14 @@ namespace WorkPlanning.Tests
 
             // Assert
             result.StatusCode.Should().Be(HttpStatusCode.OK);
-            var workers = JsonConvert.DeserializeObject<Worker>(await result.Content.ReadAsStringAsync());
+
+            var jsonResponse = await result.Content.ReadAsStringAsync();
+
+            var workers = JsonSerializer.Deserialize<WorkerDto>(jsonResponse, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
             workers.Should().NotBeNull();
             workers.Name.Should().Be("John Doe");
         }
@@ -82,16 +80,16 @@ namespace WorkPlanning.Tests
             // Arrange
             var worker = new Worker { WorkerId = 1, Name = "John Doe" };
             await _client.PostAsync("/api/workers", new StringContent(
-                JsonConvert.SerializeObject(worker), Encoding.UTF8, "application/json"));
+                JsonSerializer.Serialize(worker), Encoding.UTF8, "application/json"));
 
-            var shift = new Shift { ShiftId = 1, Date = DateTime.Now, Type = ShiftType.MORNING, Worker = worker };
+            var shift = new ShiftDto { ShiftId = 1, Date = DateTime.Now, Type = ShiftType.MORNING, WorkerId = worker.WorkerId };
             await _client.PostAsync("/api/workers/1/shifts", new StringContent(
-                JsonConvert.SerializeObject(shift), Encoding.UTF8, "application/json"));
+                JsonSerializer.Serialize(shift), Encoding.UTF8, "application/json"));
 
             // Act
-            var duplicateShift = new Shift { ShiftId = 2, Date = DateTime.Now, Type = ShiftType.AFTERNOON, Worker = worker };
+            var duplicateShift = new ShiftDto { ShiftId = 2, Date = DateTime.Now, Type = ShiftType.AFTERNOON, WorkerId = worker.WorkerId };
             var result = await _client.PostAsync("/api/workers/1/shifts", new StringContent(
-                JsonConvert.SerializeObject(duplicateShift), Encoding.UTF8, "application/json"));
+                JsonSerializer.Serialize(duplicateShift), Encoding.UTF8, "application/json"));
 
             // Assert
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -106,13 +104,13 @@ namespace WorkPlanning.Tests
             // Arrange
             var worker = new Worker { WorkerId = 1, Name = "John Doe" };
             await _client.PostAsync("/api/workers", new StringContent(
-                JsonConvert.SerializeObject(worker), Encoding.UTF8, "application/json"));
+                JsonSerializer.Serialize(worker), Encoding.UTF8, "application/json"));
 
             var invalidShift = new Shift { ShiftId = 2, Date = DateTime.Now, Type = (ShiftType)999, Worker = worker }; // Invalid ShiftType
 
             // Act
             var result = await _client.PostAsync("/api/workers/1/shifts", new StringContent(
-                JsonConvert.SerializeObject(invalidShift), Encoding.UTF8, "application/json"));
+                JsonSerializer.Serialize(invalidShift), Encoding.UTF8, "application/json"));
 
             // Assert
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);

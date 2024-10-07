@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+namespace dotnet;
 
 public class Program
 {
@@ -30,4 +31,3 @@ public class Program
         app.Run();
     }
 }
-
